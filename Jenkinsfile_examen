@@ -48,7 +48,7 @@ pipeline {
         stage('Build docker image'){
             steps {
                 copyArtifacts filter: 'target/*.jar',
-                            fingerprintArttifacts: true,
+                            fingerprintArtifacts: true,
                             projectName: '${JOB_NAME}',
                             flatten: true,
                             selector: specific('${BUILD_NUMBER}'),
