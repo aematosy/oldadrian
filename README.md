@@ -1,2 +1,7 @@
-# galaxy-examen-final-matos-adrian
-examen_final
+
+
+```
+curl http://localhost:8080/customers
+```
+
+
