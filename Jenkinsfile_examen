@@ -44,5 +44,36 @@ pipeline {
                     }
                 }
             }
+
+        stage('Build docker image'){
+            steps {
+                copyArtifacts filter: 'target/*.jar',
+                            fingerprintArttifacts: true,
+                            projectName: '${JOB_NAME}',
+                            flatten: true,
+                            selector: specific('${BUILD_NUMBER}'),
+                            target: 'build/libs/'
+                        sh 'docker-compose build'
+            }
+        }    
+        stage('Push docker image'){
+            steps {
+                script {
+                    sh 'docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}'
+                    sh 'docker tag msmicroservice ${DOCKER_CREDS_USR}/msmicroservice:$BUILD_NUMBER'
+                    sh 'docker push ${DOCKER_CREDS_USR}/msmicroservice:$BUILD_NUMBER'
+                    sh 'docker logout'
+                }
+            }
+        }
+        stage('Run Container'){
+            steps {
+                script {
+                    sh 'docker login -u ${DOCKER_CREDS_USR} -p ${DOCKER_CREDS_PSW}'
+                    sh 'docker run -d -p 8080:8080 --name galaxylab ${DOCKER_CREDS_USR}/msmicroservice:$BUILD_NUMBER'
+                    sh 'docker logout'
+                }
+            }
+        }
         }
     }
